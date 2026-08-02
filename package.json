@@ -1,0 +1,34 @@
+{
+  "name": "download-sentry",
+  "version": "1.0.0",
+  "description": "Monitor download speed and auto-shutdown PC when downloads complete",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "build": "electron-builder"
+  },
+  "keywords": [
+    "electron",
+    "download",
+    "monitor",
+    "shutdown",
+    "gaming"
+  ],
+  "author": "DownloadSentry",
+  "license": "MIT",
+  "devDependencies": {
+    "electron": "^28.0.0",
+    "electron-builder": "^24.9.1"
+  },
+  "dependencies": {
+    "systeminformation": "^5.21.20"
+  },
+  "build": {
+    "appId": "com.downloadsentry.app",
+    "productName": "DownloadSentry",
+    "win": {
+      "target": "nsis",
+      "icon": "assets/icon.ico"
+    }
+  }
+}
