@@ -1,0 +1,12 @@
+﻿# BaÄŸÄ±mlÄ±lÄ±klar ve derleme dosyalarÄ±
+node_modules/
+dist/
+dist-electron/
+build/
+bin/
+obj/
+*.log
+.env
+.vscode/
+.idea/
+.DS_Store
