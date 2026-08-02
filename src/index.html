@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Security-Policy"
+        content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com;">
+    <title>Otomatik Kapatma Sistemi</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Rajdhani:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <!-- Custom Title Bar -->
+    <div class="title-bar">
+        <div class="title-bar-drag">
+            <span class="app-logo">⚡</span>
+            <span class="app-title">Otomatik Kapatma Sistemi</span>
+        </div>
+        <div class="window-controls">
+            <button class="win-btn minimize" id="btn-minimize">
+                <svg width="12" height="12" viewBox="0 0 12 12">
+                    <rect fill="currentColor" width="10" height="1" x="1" y="6" />
+                </svg>
+            </button>
+            <button class="win-btn maximize" id="btn-maximize">
+                <svg width="12" height="12" viewBox="0 0 12 12">
+                    <rect fill="none" stroke="currentColor" width="9" height="9" x="1.5" y="1.5" />
+                </svg>
+            </button>
+            <button class="win-btn close" id="btn-close">
+                <svg width="12" height="12" viewBox="0 0 12 12">
+                    <path fill="currentColor"
+                        d="M6.707 6l3.146-3.146a.5.5 0 00-.707-.708L6 5.293 2.854 2.146a.5.5 0 10-.708.708L5.293 6l-3.147 3.146a.5.5 0 00.708.708L6 6.707l3.146 3.147a.5.5 0 00.708-.708L6.707 6z" />
+                </svg>
+            </button>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-container">
+        <!-- Stats Section -->
+        <div class="stats-section">
+            <div class="speed-display glass-card">
+                <div class="speed-label">ANLIK İNDİRME HIZI</div>
+                <div class="speed-value">
+                    <span id="speed-number">0.00</span>
+                    <span class="speed-unit" id="speed-unit">MB/s</span>
+                </div>
+                <div class="speed-secondary">
+                    <span id="speed-kbs">0</span> KB/s
+                </div>
+            </div>
+
+            <div class="interface-selector glass-card">
+                <label class="selector-label">AĞ ARAYÜZÜ</label>
+                <div class="select-wrapper">
+                    <select id="interface-select">
+                        <option value="">Algılanıyor...</option>
+                    </select>
+                    <button class="icon-btn refresh-btn" id="btn-refresh-interfaces" title="Yenile">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <path d="M23 4v6h-6M1 20v-6h6" />
+                            <path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15" />
+                        </svg>
+                    </button>
+                </div>
+
+                <!-- Kalibrasyon Butonu -->
+                <button class="calibrate-btn" id="btn-calibrate">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="3" />
+                        <path
+                            d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83" />
+                    </svg>
+                    <span>Kalibre Et</span>
+                </button>
+                <div class="calibration-status" id="calibration-status"></div>
+            </div>
+        </div>
+
+        <!-- Graph Section -->
+        <div class="graph-section glass-card">
+            <div class="graph-header">
+                <span class="graph-title">HIZ GEÇMİŞİ</span>
+                <span class="graph-subtitle">Son 60 saniye</span>
+            </div>
+            <div class="chart-container">
+                <canvas id="speed-chart"></canvas>
+            </div>
+        </div>
+
+        <!-- Configuration Section -->
+        <div class="config-section">
+            <div class="config-card glass-card">
+                <div class="config-header">
+                    <span class="config-icon">⚡</span>
+                    <span class="config-title">TETİKLEME AYARLARI</span>
+                </div>
+
+                <div class="config-inputs">
+                    <div class="input-group">
+                        <label>Eşik Hızı</label>
+                        <div class="input-with-unit">
+                            <input type="number" id="threshold-input" value="100" min="1" max="10000">
+                            <span class="input-unit">KB/s</span>
+                        </div>
+                        <span class="input-hint">💡 Kalibre Et ile otomatik ayarla</span>
+                    </div>
+
+                    <div class="input-group">
+                        <label>Bekleme Süresi</label>
+                        <div class="input-with-unit">
+                            <input type="number" id="duration-input" value="120" min="10" max="600">
+                            <span class="input-unit">saniye</span>
+                        </div>
+                        <span class="input-hint">Hız bu süre boyunca düşük kalmalı</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="status-card glass-card">
+                <div class="status-indicator" id="status-indicator">
+                    <span class="status-dot"></span>
+                    <span class="status-text" id="status-text">BEKLEMEDE</span>
+                </div>
+                <div class="trigger-progress" id="trigger-progress-container" style="display: none;">
+                    <div class="progress-label">Düşük hız algılandı:</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="trigger-progress"></div>
+                    </div>
+                    <div class="progress-time" id="progress-time">0s / 120s</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Control Button -->
+        <div class="control-section">
+            <button class="monitor-btn" id="btn-monitor">
+                <span class="btn-icon">▶</span>
+                <span class="btn-text">İZLEMEYİ BAŞLAT</span>
+            </button>
+        </div>
+
+        <!-- Test Mode Banner -->
+        <div class="test-mode-banner">
+            🧪 TEST MODU AKTİF - Gerçek kapatma devre dışı
+        </div>
+    </div>
+
+    <!-- Countdown Modal -->
+    <div class="countdown-modal" id="countdown-modal">
+        <div class="countdown-content">
+            <div class="countdown-icon">⚠</div>
+            <h1 class="countdown-title">İNDİRME TAMAMLANDI</h1>
+            <p class="countdown-subtitle">Ağ aktivitesi durdu. Bilgisayar kapanacak:</p>
+
+            <div class="countdown-timer">
+                <span id="countdown-number">60</span>
+                <span class="countdown-unit">saniye</span>
+            </div>
+
+            <div class="countdown-progress">
+                <div class="countdown-progress-bar" id="countdown-progress-bar"></div>
+            </div>
+
+            <button class="cancel-btn" id="btn-cancel-shutdown">
+                <span class="cancel-icon">✕</span>
+                <span>KAPATMAYI İPTAL ET</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Calibration Modal -->
+    <div class="calibration-modal" id="calibration-modal">
+        <div class="calibration-modal-content glass-card">
+            <div class="calibration-header">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="3" />
+                    <path
+                        d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83" />
+                </svg>
+                <h2>Kalibrasyon</h2>
+            </div>
+            <p class="calibration-desc">Arka plan ağ trafiğini ölçüyorum. Lütfen büyük indirme yapma...</p>
+            <div class="calibration-spinner"></div>
+            <div class="calibration-reading">
+                <span class="reading-label">Ölçülen Hız:</span>
+                <span class="reading-value" id="calibration-reading">0 KB/s</span>
+            </div>
+            <div class="calibration-progress">
+                <div class="calibration-progress-bar" id="calibration-progress-bar"></div>
+            </div>
+            <p class="calibration-timer" id="calibration-timer">10 saniye kaldı...</p>
+        </div>
+    </div>
+
+    <!-- Chart.js from CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <script src="renderer.js"></script>
+</body>
+
+</html>
